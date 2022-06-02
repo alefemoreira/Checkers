@@ -11,92 +11,92 @@ import java.lang.Math;
  */
 public class Peca {
 
-    public static final int PRETA = 0;
-    public static final int BRANCA = 1;
-    public static final int DAMA_PRETA = 2;
-    public static final int DAMA_BRANCA = 3;
+  public static final int PRETA = 0;
+  public static final int BRANCA = 1;
+  public static final int DAMA_PRETA = 2;
+  public static final int DAMA_BRANCA = 3;
 
-    protected Casa casa;
-    protected int tipo;
-    protected int jogadas;
+  protected Casa casa;
+  protected int tipo;
+  protected int jogadas;
 
-    public Peca(Casa casa, int tipo) {
-        this.casa = casa;
-        this.tipo = tipo;
-        this.jogadas = 0;
-        casa.colocarPeca(this);
+  public Peca(Casa casa, int tipo) {
+    this.casa = casa;
+    this.tipo = tipo;
+    this.jogadas = 0;
+    casa.colocarPeca(this);
+  }
+
+  public static Peca criarNovaPeca(Casa casa, int tipo) {
+    if (tipo > 3) {
+      throw new Error("Tipo invalido");
     }
-
-    public static Peca criarNovaPeca(Casa casa, int tipo) {
-        if (tipo > 3) {
-            throw new Error("Tipo invalido");
-        }
-        if (Peca.PRETA == tipo) {
-            return new PecaPreta(casa, tipo);
-        }
-        if (Peca.BRANCA == tipo) {
-            return new PecaBranca(casa, tipo);
-        }
-        if (Peca.DAMA_PRETA == tipo) {
-            return new DamaPreta(casa, tipo);
-        }
-        if (Peca.DAMA_BRANCA == tipo) {
-            return new DamaBranca(casa, tipo);
-        }
-        return null;
+    if (Peca.PRETA == tipo) {
+      return new PecaPreta(casa, tipo);
     }
-    
-    /**
-     * Movimenta a peca para uma nova casa.
-     * @param destino nova casa que ira conter esta peca.
-     */
-    public void mover(Casa destino) {
-        if(this.podeMover(destino)) {
-            this.casa.removerPeca();
-            destino.colocarPeca(this);
-            this.casa = destino;
-            this.jogadas += 1;
-        }
+    if (Peca.BRANCA == tipo) {
+      return new PecaBranca(casa, tipo);
     }
-
-    /**
-     * Valor    Tipo
-     *   0   Branco (PECA)
-     *   1   Branco (DAMA)
-     *   2   Preto (PECA)
-     *   3   Preto (DAMA)
-     * @return o tipo da peca.
-     */
-    public int getTipo() {
-        return tipo;
+    if (Peca.DAMA_PRETA == tipo) {
+      return new DamaPreta(casa, tipo);
     }
-
-    public boolean ehBranca() {
-        return this.tipo >= 6 && this.tipo <= 11;
+    if (Peca.DAMA_BRANCA == tipo) {
+      return new DamaBranca(casa, tipo);
     }
-
-    public boolean ehMesmaCor(Peca peca) {
-        return peca.ehBranca() == this.ehBranca();
+    return null;
+  }
+  
+  /**
+   * Movimenta a peca para uma nova casa.
+   * @param destino nova casa que ira conter esta peca.
+   */
+  public void mover(Casa destino) {
+    if(this.podeMover(destino)) {
+      this.casa.removerPeca();
+      destino.colocarPeca(this);
+      this.casa = destino;
+      this.jogadas += 1;
     }
+  }
 
-    public boolean vaiMatar(Casa destino) {
-        Peca pecaDestino = destino.getPeca();
-        return destino.possuiPeca() && !this.ehMesmaCor(pecaDestino) && destino.estaNaDiagonalSuperiorDe(this.casa);
-    }
+  /**
+   * Valor  Tipo
+   *   0   Branco (PECA)
+   *   1   Branco (DAMA)
+   *   2   Preto (PECA)
+   *   3   Preto (DAMA)
+   * @return o tipo da peca.
+   */
+  public int getTipo() {
+    return tipo;
+  }
 
-    public boolean ehPosicaoPermitida(Casa destino) {
-        int posicaoXOrigem = this.casa.getPosicaoX();
-        int posicaoYOrigem = this.casa.getPosicaoY();
-        int posicaoXDestino = destino.getPosicaoX();
-        int posicaoYDestino = destino.getPosicaoY();
+  public boolean ehBranca() {
+    return this.tipo >= 6 && this.tipo <= 11;
+  }
 
-        int deltaX = posicaoXDestino - posicaoXOrigem;
-        int deltaY = posicaoYDestino - posicaoYOrigem;
+  public boolean ehMesmaCor(Peca peca) {
+    return peca.ehBranca() == this.ehBranca();
+  }
 
-        return Math.abs(deltaX) == Math.abs(deltaY) && Math.abs(deltaX) == 1;   
-    }
+  public boolean vaiMatar(Casa destino) {
+    Peca pecaDestino = destino.getPeca();
+    return destino.possuiPeca() && !this.ehMesmaCor(pecaDestino) && destino.estaNaDiagonalSuperiorDe(this.casa);
+  }
 
-    public boolean podeMover(Casa destino) {
-        return (!destino.possuiPeca() || this.ehBranca() != destino.getPeca().ehBranca()) && this.ehPosicaoPermitida(destino);
-    }
+  public boolean ehPosicaoPermitida(Casa destino) {
+    int posicaoXOrigem = this.casa.getPosicaoX();
+    int posicaoYOrigem = this.casa.getPosicaoY();
+    int posicaoXDestino = destino.getPosicaoX();
+    int posicaoYDestino = destino.getPosicaoY();
+
+    int deltaX = posicaoXDestino - posicaoXOrigem;
+    int deltaY = posicaoYDestino - posicaoYOrigem;
+
+    return Math.abs(deltaX) == Math.abs(deltaY) && Math.abs(deltaX) == 1;   
+  }
+
+  public boolean podeMover(Casa destino) {
+    return (!destino.possuiPeca() || this.ehBranca() != destino.getPeca().ehBranca()) && this.ehPosicaoPermitida(destino);
+  }
 }
