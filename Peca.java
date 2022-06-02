@@ -93,7 +93,7 @@ public class Peca {
         int deltaX = posicaoXDestino - posicaoXOrigem;
         int deltaY = posicaoYDestino - posicaoYOrigem;
 
-        return Math.abs(deltaX) == Math.abs(deltaY) && Math.abs(deltaX) == 1;        
+        return Math.abs(deltaX) == Math.abs(deltaY) && Math.abs(deltaX) == 1;   
     }
 
     public boolean podeMover(Casa destino) {
