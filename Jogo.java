@@ -61,7 +61,7 @@ public class Jogo {
     Casa origem = tabuleiro.getCasa(origemX, origemY);
     Casa destino = tabuleiro.getCasa(destinoX, destinoY);
     Peca peca = origem.getPeca();
-    peca.mover(destino);
+    peca.mover(destino, tabuleiro);
   }
   
   /**

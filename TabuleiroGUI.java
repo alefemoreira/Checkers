@@ -1,6 +1,7 @@
 
 import java.awt.Color;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 
 /**
  * Interface Grafica do Tabuleiro do jogo.
@@ -100,6 +101,13 @@ public class TabuleiroGUI extends JPanel {
           casaGUI.apagarPeca();
         }
       }
+    }
+
+    //Verificando se ainda há peças de duas cores no tabuleiro
+    if (jogo.getTabuleiro().getTotalBrancas() == 0) {
+      JOptionPane.showMessageDialog(this, "As Damas Vermelhas ganharam o jogo");
+    } else if(jogo.getTabuleiro().getTotalPretas() == 0){
+      JOptionPane.showMessageDialog(this, "As Damas Brancas ganharam o jogo");
     }
   }
 

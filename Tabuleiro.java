@@ -1,4 +1,3 @@
-
 /**
  * O Tabuleiro do jogo. 
  * Respons�vel por armazenar as 64 casas.
@@ -9,6 +8,9 @@
 public class Tabuleiro {
 
   private Casa[][] casas;
+  private boolean TurnoPreto;
+  private int totalBrancas = 12;
+  private int totalPretas = 12;  
 
   public Tabuleiro() {
     casas = new Casa[8][8];
@@ -27,4 +29,33 @@ public class Tabuleiro {
   public Casa getCasa(int x, int y) {
     return casas[x][y];
   }
+
+  public boolean isTurnoPreto() {
+    return TurnoPreto;
+  }
+  public void setTurnoPreto(boolean turnoPreto) {
+      TurnoPreto = turnoPreto;
+  }
+
+  public void inverteTurno() {
+    TurnoPreto = !TurnoPreto;
+  }
+
+  
+  public int getTotalBrancas() {
+    return totalBrancas;
+  }
+
+  public void setTotalBrancas(int totalBrancas) {
+    this.totalBrancas = totalBrancas;
+  }
+
+  public int getTotalPretas() {
+    return totalPretas;
+  }
+
+  public void setTotalPretas(int totalPretas) {
+    this.totalPretas = totalPretas;
+  }
+
 }

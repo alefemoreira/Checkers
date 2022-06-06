@@ -3,15 +3,17 @@ public class PecaBranca extends Peca {
   super(casa, tipo);
   }
 
-  public boolean ehPosicaoPermitida(Casa destino) {
-  int posicaoXOrigem = this.casa.getPosicaoX();
-  int posicaoYOrigem = this.casa.getPosicaoY();
-  int posicaoXDestino = destino.getPosicaoX();
-  int posicaoYDestino = destino.getPosicaoY();
+  public boolean ehPosicaoPermitida(Casa destino,  Tabuleiro tabuleiro) {
+    int posicaoXOrigem = this.casa.getPosicaoX();
+    int posicaoYOrigem = this.casa.getPosicaoY();
+    int posicaoXDestino = destino.getPosicaoX();
+    int posicaoYDestino = destino.getPosicaoY();
 
-  int deltaX = posicaoXDestino - posicaoXOrigem;
-  int deltaY = posicaoYDestino - posicaoYOrigem;
+    int deltaX = posicaoXDestino - posicaoXOrigem;
+    int deltaY = posicaoYDestino - posicaoYOrigem;
+    System.out.println("Mover de peça branca");
 
-  return Math.abs(deltaX) == Math.abs(deltaY) && deltaY == 1;
+
+    return Math.abs(deltaX) == Math.abs(deltaY) && deltaY == 1;
   }
 }
