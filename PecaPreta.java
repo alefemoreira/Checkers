@@ -15,4 +15,15 @@ public class PecaPreta extends Peca {
 
     return Math.abs(deltaX) == Math.abs(deltaY) && deltaY == -1;
   }
+
+  public boolean podePromover() {
+    return this.casa.getPosicaoY() == 0;
+  }
+
+  @Override
+  void promover() {
+    this.casa.removerPeca();
+    Peca dama = Peca.criarNovaPeca(casa, 2);
+    this.casa.colocarPeca(dama);
+  }
 }

@@ -7,7 +7,7 @@ import java.lang.Math;
  * @author Alan Moraes &lt;alan@ci.ufpb.br&gt;
  * @author Leonardo Villeth &lt;lvilleth@cc.ci.ufpb.br&gt;
  */
-public class Peca {
+public abstract class Peca {
 
   public static final int PRETA = 0;
   public static final int BRANCA = 1;
@@ -17,6 +17,9 @@ public class Peca {
   protected Casa casa;
   protected int tipo;
   protected int jogadas;
+
+  abstract boolean podePromover();
+  abstract void promover();
 
   public Peca(Casa casa, int tipo) {
     this.casa = casa;
@@ -54,7 +57,10 @@ public class Peca {
       destino.colocarPeca(this);
       this.casa = destino;
       this.jogadas += 1;
-      // tabuleiro.setTurnoPreto(!tabuleiro.isTurnoPreto());
+      if (this.podePromover()) {
+        this.promover();
+      }
+
       tabuleiro.inverteTurno();
     }
   }
@@ -93,7 +99,7 @@ public class Peca {
     int deltaX = posicaoXDestino - posicaoXOrigem;
     int deltaY = posicaoYDestino - posicaoYOrigem;
 
-    return Math.abs(deltaX) == Math.abs(deltaY) && Math.abs(deltaX) == 1;   
+    return Math.abs(deltaX) == Math.abs(deltaY);   
   }
 
   public boolean podeMover(Casa destino,  Tabuleiro tabuleiro) {
