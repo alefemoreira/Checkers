@@ -104,7 +104,7 @@ public abstract class Peca {
 
   public boolean podeMover(Casa destino,  Tabuleiro tabuleiro) {
     boolean pecaIsBlack = this.tipo == 0 || this.tipo == 2;
-
+    
     // So move a peça se o turno for o correto para a cor da peça
     if ((pecaIsBlack && !tabuleiro.isTurnoPreto()) || (!pecaIsBlack && tabuleiro.isTurnoPreto())) { 
       System.out.println("Turno errado");
