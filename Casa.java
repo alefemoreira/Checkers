@@ -30,10 +30,10 @@ public class Casa {
    */
   public void removerPeca(Tabuleiro tabuleiro) {
     // Decrementando a contagem de pecas
-    if(peca.tipo == 0 ||  peca.tipo == 2){
-     tabuleiro.setTotalPretas(tabuleiro.getTotalPretas()-1);
+    if(peca.cor == Cor.PRETA){
+     tabuleiro.setTotalPretas(tabuleiro.getTotalPretas() - 1);
     } else {
-      tabuleiro.setTotalBrancas(tabuleiro.getTotalBrancas()-1);
+      tabuleiro.setTotalBrancas(tabuleiro.getTotalBrancas() - 1);
     }    
     peca = null;
   }

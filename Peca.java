@@ -9,15 +9,9 @@ import java.util.ArrayList;
  * @author Leonardo Villeth &lt;lvilleth@cc.ci.ufpb.br&gt;
  */
 public abstract class Peca {
-
-  public static final int PRETA = 0;
-  public static final int BRANCA = 1;
-  public static final int DAMA_PRETA = 2;
-  public static final int DAMA_BRANCA = 3;
   public  boolean moveAndCapture = false;
 
   protected Casa casa;
-  protected int tipo;
   protected int jogadas;
   protected Cor cor;
 
@@ -76,7 +70,7 @@ public abstract class Peca {
             tabuleiro.inverteTurno(); 
           } 
          
-          if ((this.tipo == PRETA || this.tipo == DAMA_PRETA) && move) {
+          if ((this.cor == Cor.PRETA) && move) {
             System.out.println("Peça branca pode se mover novamente");
           } else if(move) {
             System.out.println("Peça branca pode se mover novamente");

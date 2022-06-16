@@ -161,7 +161,7 @@ public class Dama extends Peca {
 
   @Override
   public boolean podeMover(Casa destino,  Tabuleiro tabuleiro) {    
-    boolean pecaIsBlack = this.tipo == 0 || this.tipo == 2;
+    boolean pecaIsBlack = !this.ehBranca();
     int posicaoXOrigem = this.casa.getPosicaoX();
     int posicaoYOrigem = this.casa.getPosicaoY();
     int posicaoXDestino = destino.getPosicaoX();
