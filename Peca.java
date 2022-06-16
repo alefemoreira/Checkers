@@ -59,10 +59,10 @@ public abstract class Peca {
           casaEsquerdaSuperior =  this.casa.getPosicaoX() - 2 >= 0 && this.casa.getPosicaoY() + 2 < 8 ?  tabuleiro.getCasa(this.casa.getPosicaoX()-2, this.casa.getPosicaoY()+2) : this.casa;
   
           // Verificando se existe alguma casa possivel 
-          Boolean move = (this.canMoveToCapture(casaDireitaSuperior, tabuleiro, true) && !casaDireitaSuperior.possuiPeca() )||
-                         (this.canMoveToCapture(casaEsquerdaInferior, tabuleiro, true) && !casaEsquerdaInferior.possuiPeca() )||
-                         (this.canMoveToCapture(casaDireitaInferior, tabuleiro, true) && !casaDireitaInferior.possuiPeca())||
-                         (this.canMoveToCapture(casaEsquerdaSuperior, tabuleiro, true) && !casaEsquerdaSuperior.possuiPeca());  
+          Boolean move = (this.podeCapturarNovamente(casaDireitaSuperior, tabuleiro) && !casaDireitaSuperior.possuiPeca() )||
+                         (this.podeCapturarNovamente(casaEsquerdaInferior, tabuleiro) && !casaEsquerdaInferior.possuiPeca() )||
+                         (this.podeCapturarNovamente(casaDireitaInferior, tabuleiro) && !casaDireitaInferior.possuiPeca())||
+                         (this.podeCapturarNovamente(casaEsquerdaSuperior, tabuleiro) && !casaEsquerdaSuperior.possuiPeca());  
   
           // Depois que a peça se move é analiádo se existe alguma possibilidade de captura
           if (!move) {
@@ -195,8 +195,7 @@ public abstract class Peca {
       return false;
     }
 
-    //  Se a peça for se mover e capturar outra peça a flag de movimento e captura é setada True(para realizar outro movimento)
-    boolean capture = canMoveToCapture(destino, tabuleiro, false);
+    boolean capture = capturar(destino, tabuleiro);
     boolean move = !destino.possuiPeca() && (capture || this.ehPosicaoPermitida(destino, tabuleiro));   
     if (move && capture) {
       this.setMoveAndCapture(true);
@@ -217,7 +216,7 @@ public abstract class Peca {
    * @param search Quando true ativa o modo pesquisa.
    * 
    */
-  public boolean canMoveToCapture(Casa destino, Tabuleiro tabuleiro, boolean search) {
+  public boolean capturar(Casa destino, Tabuleiro tabuleiro) {
     int posicaoXOrigem = this.casa.getPosicaoX();
     int posicaoYOrigem = this.casa.getPosicaoY();
     int posicaoXDestino = destino.getPosicaoX();
@@ -235,10 +234,7 @@ public abstract class Peca {
       Peca pecaDeCaptura = casaDeCaptura.getPeca();
 
       if (casaDeCaptura.possuiPeca() && !this.ehMesmaCor(pecaDeCaptura)) {
-        // Captura e move, remove a peça capturada se a função não for executada no modo pesquisa
-        if(!search){
           casaDeCaptura.removerPeca(tabuleiro);     
-        }
         return true;
       }      
     }
@@ -247,6 +243,7 @@ public abstract class Peca {
      return false;
       
   }
+
 
   public boolean podeCapturar(Tabuleiro tabuleiro) {
     ArrayList<Integer> posicoesProibidas = new ArrayList<Integer>();
@@ -281,6 +278,34 @@ public abstract class Peca {
     }
 
     return false;
+  }
+
+
+  public boolean podeCapturarNovamente(Casa destino, Tabuleiro tabuleiro) {
+    int posicaoXOrigem = this.casa.getPosicaoX();
+    int posicaoYOrigem = this.casa.getPosicaoY();
+    int posicaoXDestino = destino.getPosicaoX();
+    int posicaoYDestino = destino.getPosicaoY();
+
+    int deltaX = posicaoXDestino - posicaoXOrigem;
+    int deltaY = posicaoYDestino - posicaoYOrigem;
+    if(Math.abs(deltaX) == Math.abs(deltaY) && Math.abs(deltaX) == 2) {
+      // Determinando a possição intermediria da pessa que será capturada
+      int xCapture = deltaX < 0 ? posicaoXDestino + 1 :  posicaoXDestino - 1;
+      int yCapture = deltaY < 0 ? posicaoYDestino + 1 :  posicaoYDestino - 1;
+
+      // Só faz a captura e o movimento se houver um peça na casa intermetiaria do movimento de 2 casas
+      Casa casaDeCaptura = tabuleiro.getCasa(xCapture, yCapture);
+      Peca pecaDeCaptura = casaDeCaptura.getPeca();
+
+      if (casaDeCaptura.possuiPeca() && !this.ehMesmaCor(pecaDeCaptura)) {          
+        return true;
+      }      
+    }
+
+     //Não move
+     return false;
+      
   }
 
   public boolean isMoveAndCapture() {

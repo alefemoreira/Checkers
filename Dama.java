@@ -43,7 +43,7 @@ public class Dama extends Peca {
   void promover() {}
 
   @Override
-  public boolean canMoveToCapture(Casa destino, Tabuleiro tabuleiro, boolean search) {
+  public boolean capturar(Casa destino, Tabuleiro tabuleiro) {
     int posicaoXOrigem = this.casa.getPosicaoX();
     int posicaoYOrigem = this.casa.getPosicaoY();
     int posicaoXDestino = destino.getPosicaoX();
@@ -75,9 +75,7 @@ public class Dama extends Peca {
     }
 
     if (quantidadeDePecas == 1 && !this.ehMesmaCor(ultimaPeca)) {
-      if (!search) {
         casaDaUltimaPeca.removerPeca(tabuleiro);
-      }
       return true;
     }
 
@@ -235,7 +233,7 @@ public class Dama extends Peca {
 
 
     //  Se a peça for se mover e capturar outra peça a flag de movimento e captura é setada True(para realizar outro movimento)
-    boolean capture = canMoveToCapture(destino, tabuleiro, false);
+    boolean capture = capturar(destino, tabuleiro);
     boolean move = !destino.possuiPeca() && (capture || this.ehPosicaoPermitida(destino, tabuleiro));   
     if (move && capture) {
       this.setMoveAndCapture(true);
