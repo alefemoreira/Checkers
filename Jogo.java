@@ -30,8 +30,8 @@ public class Jogo {
         if (i % 2 == 1 && j == 0) {
           j++;
         }
-        Casa casaPreta = tabuleiro.getCasa(j, i);
-        Peca.criarNovaPeca(casaPreta, Peca.PRETA);
+        Casa casa = tabuleiro.getCasa(j, i);
+        new Pedra(casa, Cor.PRETA);
       }
       }
   }
@@ -42,8 +42,8 @@ public class Jogo {
       if (i % 2 == 1 && j == 0) {
         j++;
       }
-      Casa casaBranca = tabuleiro.getCasa(j, i);
-      Peca.criarNovaPeca(casaBranca, Peca.BRANCA);
+      Casa casa = tabuleiro.getCasa(j, i);
+      new Pedra(casa, Cor.BRANCA);
       }
     }
   }

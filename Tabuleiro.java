@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * O Tabuleiro do jogo. 
  * Respons�vel por armazenar as 64 casas.
@@ -8,7 +10,7 @@
 public class Tabuleiro {
 
   private Casa[][] casas;
-  private boolean TurnoPreto;
+  private boolean turnoPreto;
   private int totalBrancas = 12;
   private int totalPretas = 12;  
 
@@ -31,16 +33,61 @@ public class Tabuleiro {
   }
 
   public boolean isTurnoPreto() {
-    return TurnoPreto;
+    return turnoPreto;
   }
+
+  public Cor corTurno() {
+    return turnoPreto ? Cor.PRETA : Cor.BRANCA;
+  }
+
   public void setTurnoPreto(boolean turnoPreto) {
-      TurnoPreto = turnoPreto;
+      turnoPreto = turnoPreto;
   }
 
   public void inverteTurno() {
-    TurnoPreto = !TurnoPreto;
+    turnoPreto = !turnoPreto;
   }
 
+  public ArrayList<Peca> encontractPecasQuePodemCapturar(boolean pecaBranca) {
+    if (pecaBranca) {
+      return this.encontractPecasQuePodemCapturarBrancas();
+    } 
+    return this.encontractPecasQuePodemCapturarPretas();
+  }
+
+  public ArrayList<Peca> encontractPecasQuePodemCapturarBrancas() {
+    ArrayList<Peca> pecasQPodemCapturar = new ArrayList<Peca>();
+    
+    for(int i = 0; i < 8; i++) {
+      for(int j = 0; j < 8; j++) {
+        Casa casa = casas[i][j];
+        Peca peca = casa.getPeca();
+        if(casa.possuiPeca() && peca.ehBranca() && peca.podeCapturar(this)) {
+          pecasQPodemCapturar.add(peca);
+        }
+      }
+    }
+
+    return pecasQPodemCapturar;
+  }
+  
+  public ArrayList<Peca> encontractPecasQuePodemCapturarPretas() {
+    ArrayList<Peca> pecasQPodemCapturar = new ArrayList<Peca>();
+    
+    for(int i = 0; i < 8; i++) {
+      for(int j = 0; j < 8; j++) {
+        Casa casa = casas[i][j];
+        Peca peca = casa.getPeca();
+        if(casa.possuiPeca() && !peca.ehBranca() && peca.podeCapturar(this)) {
+          System.out.println("É dama? vv");
+          System.out.println(peca instanceof Dama);
+          pecasQPodemCapturar.add(peca);
+        }
+      }
+    }
+
+    return pecasQPodemCapturar;
+  }
   
   public int getTotalBrancas() {
     return totalBrancas;

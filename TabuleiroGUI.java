@@ -82,19 +82,18 @@ public class TabuleiroGUI extends JPanel {
         if (casa.possuiPeca()) {
           Peca peca = casa.getPeca();
 
-          switch (peca.getTipo()) {
-            case Peca.BRANCA:
+          if (peca instanceof Pedra) {
+            if (peca.getCor() == Cor.BRANCA) {
               casaGUI.desenharPedraBranca();
-              break;
-            case Peca.DAMA_BRANCA:
-              casaGUI.desenharDamaBranca();
-              break;
-            case Peca.DAMA_PRETA:
-              casaGUI.desenharDamaPreta();
-              break;
-            case Peca.PRETA:
+            } else if (peca.getCor() == Cor.PRETA) {
               casaGUI.desenharPedraPreta();
-              break;
+            }
+          } else if (peca instanceof Dama) {
+            if (peca.getCor() == Cor.BRANCA) {
+              casaGUI.desenharDamaBranca();
+            } else if (peca.getCor() == Cor.PRETA) {
+              casaGUI.desenharDamaPreta();
+            }
           }
         }
         else {

@@ -1,4 +1,5 @@
 import java.lang.Math;
+import java.util.ArrayList;
 
 /**
  * Representa uma Pe�a do jogo.
@@ -13,55 +14,82 @@ public abstract class Peca {
   public static final int BRANCA = 1;
   public static final int DAMA_PRETA = 2;
   public static final int DAMA_BRANCA = 3;
+  public  boolean moveAndCapture = false;
 
   protected Casa casa;
   protected int tipo;
   protected int jogadas;
+  protected Cor cor;
 
   abstract boolean podePromover();
   abstract void promover();
-
-  public Peca(Casa casa, int tipo) {
+  // # Substituir tipo por cor
+  public Peca(Casa casa, Cor cor) {
     this.casa = casa;
-    this.tipo = tipo;
+    this.cor = cor;
     this.jogadas = 0;
     casa.colocarPeca(this);
   }
-
-  public static Peca criarNovaPeca(Casa casa, int tipo) {
-    if (tipo > 3) {
-      throw new Error("Tipo invalido");
-    }
-    if (Peca.PRETA == tipo) {
-      return new PecaPreta(casa, tipo);
-    }
-    if (Peca.BRANCA == tipo) {
-      return new PecaBranca(casa, tipo);
-    }
-    if (Peca.DAMA_PRETA == tipo) {
-      return new DamaPreta(casa, tipo);
-    }
-    if (Peca.DAMA_BRANCA == tipo) {
-      return new DamaBranca(casa, tipo);
-    }
-    return null;
-  }
-  
   /**
    * Movimenta a peca para uma nova casa.
    * @param destino nova casa que ira conter esta peca.
    */
   public void mover(Casa destino, Tabuleiro tabuleiro) {
-    if(this.podeMover(destino, tabuleiro)) {
+    if(this.podeMover(destino, tabuleiro)) {     
       this.casa.removerPeca();
       destino.colocarPeca(this);
       this.casa = destino;
       this.jogadas += 1;
+
+      if (this.cor == Cor.PRETA) {
+        System.out.println("Peça vermelha foi movida");
+      } else {
+        System.out.println("Peça branca foi movida");
+      }
+
       if (this.podePromover()) {
         this.promover();
       }
 
-      tabuleiro.inverteTurno();
+      // Verificando se a peça pode se mover novamente
+      if (this.moveAndCapture) {
+        Casa casaDireitaSuperior;
+        Casa casaEsquerdaInferior;
+        Casa casaDireitaInferior;
+        Casa casaEsquerdaSuperior;
+
+        if (moveAndCapture) {
+          casaDireitaSuperior = this.casa.getPosicaoX() + 2 < 8 && this.casa.getPosicaoY() + 2 < 8 ? tabuleiro.getCasa(this.casa.getPosicaoX()+2, this.casa.getPosicaoY()+2) : this.casa;
+          casaEsquerdaInferior = this.casa.getPosicaoX() - 2 >= 0 && this.casa.getPosicaoY() - 2 >= 0 ?  tabuleiro.getCasa(this.casa.getPosicaoX()-2, this.casa.getPosicaoY()-2) : this.casa;
+          casaDireitaInferior = this.casa.getPosicaoX() + 2 < 8 && this.casa.getPosicaoY() - 2 >= 0 ?  tabuleiro.getCasa(this.casa.getPosicaoX()+2, this.casa.getPosicaoY()-2) : this.casa;
+          casaEsquerdaSuperior =  this.casa.getPosicaoX() - 2 >= 0 && this.casa.getPosicaoY() + 2 < 8 ?  tabuleiro.getCasa(this.casa.getPosicaoX()-2, this.casa.getPosicaoY()+2) : this.casa;
+  
+          // Verificando se existe alguma casa possivel 
+          Boolean move = (this.canMoveToCapture(casaDireitaSuperior, tabuleiro, true) && !casaDireitaSuperior.possuiPeca() )||
+                         (this.canMoveToCapture(casaEsquerdaInferior, tabuleiro, true) && !casaEsquerdaInferior.possuiPeca() )||
+                         (this.canMoveToCapture(casaDireitaInferior, tabuleiro, true) && !casaDireitaInferior.possuiPeca())||
+                         (this.canMoveToCapture(casaEsquerdaSuperior, tabuleiro, true) && !casaEsquerdaSuperior.possuiPeca());  
+  
+          // Depois que a peça se move é analiádo se existe alguma possibilidade de captura
+          if (!move) {
+            this.setMoveAndCapture(false);
+            tabuleiro.inverteTurno(); 
+          } 
+         
+          if ((this.tipo == PRETA || this.tipo == DAMA_PRETA) && move) {
+            System.out.println("Peça branca pode se mover novamente");
+          } else if(move) {
+            System.out.println("Peça branca pode se mover novamente");
+          }
+          
+          
+        }       
+      } else {
+        tabuleiro.inverteTurno();        
+      }
+
+      // Só troca o turno se a peça não tiver capturado outra
+      
     }
   }
 
@@ -73,16 +101,20 @@ public abstract class Peca {
    *   3   Branco (DAMA)
    * @return o tipo da peca.
    */
-  public int getTipo() {
-    return tipo;
+  public Cor getCor() {
+    return this.cor;
   }
 
   public boolean ehBranca() {
-    return this.tipo == 1 || this.tipo == 3;
+    return this.cor == Cor.BRANCA;
   }
 
   public boolean ehMesmaCor(Peca peca) {
-    return peca.ehBranca() == this.ehBranca();
+    return this.cor == peca.getCor();
+  }
+
+  public int getDeltaDeCaptura() {
+    return 2;
   }
 
   public boolean vaiMatar(Casa destino) {
@@ -102,20 +134,96 @@ public abstract class Peca {
     return Math.abs(deltaX) == Math.abs(deltaY);   
   }
 
-  public boolean podeMover(Casa destino,  Tabuleiro tabuleiro) {
-    boolean pecaIsBlack = this.tipo == 0 || this.tipo == 2;
-    
-    // So move a peça se o turno for o correto para a cor da peça
-    if ((pecaIsBlack && !tabuleiro.isTurnoPreto()) || (!pecaIsBlack && tabuleiro.isTurnoPreto())) { 
+  public boolean equals(Peca peca) {
+    int x = this.casa.getPosicaoX();
+    int y = this.casa.getPosicaoY();
+    int pecaX = peca.casa.getPosicaoX();
+    int pecaY = peca.casa.getPosicaoY();
+
+    return x == pecaX && y == pecaY;
+  }
+
+  public boolean podeMover(Casa destino,  Tabuleiro tabuleiro) {    
+    boolean pecaIsBlack = !this.ehBranca();
+    int posicaoXOrigem = this.casa.getPosicaoX();
+    int posicaoYOrigem = this.casa.getPosicaoY();
+    int posicaoXDestino = destino.getPosicaoX();
+    int posicaoYDestino = destino.getPosicaoY();
+
+    int deltaX = posicaoXDestino - posicaoXOrigem;
+    int deltaY = posicaoYDestino - posicaoYOrigem;
+
+    if (Math.abs(deltaX) != Math.abs(deltaY)) return false;
+    // Verificando se outra peça fez um movimento de captura e tem que se mover de novo
+    for (int i = 0; i <= 7; i++) {
+      for (int j = 0; j <= 7; j++) {
+        Casa casa = tabuleiro.getCasa(i, j);
+        if(casa.possuiPeca()) {
+          Peca peca = casa.getPeca();
+          //System.out.println(casa != this.casa);
+          if(peca.moveAndCapture && casa != this.casa) {
+            if (pecaIsBlack && tabuleiro.isTurnoPreto()) {
+              System.out.println("Apenas a peça vermelha que fez a captura pode se mover");
+            } else if (!pecaIsBlack && !tabuleiro.isTurnoPreto()){
+              System.out.println("Apenas a peça branca que fez a captura pode se mover");
+            }
+         
+            return false;
+          }
+        }
+      }
+    }
+
+    if (this.moveAndCapture) {
+      if(Math.abs(deltaX) < this.getDeltaDeCaptura() && Math.abs(deltaY) < this.getDeltaDeCaptura()) {
+        if (pecaIsBlack && tabuleiro.isTurnoPreto()) {
+          System.out.println("A peça vermelha é obrigada a captura");
+        } else if (!pecaIsBlack && !tabuleiro.isTurnoPreto()){
+          System.out.println("A peça branca é obrigada a captura");
+        }
+        return false;
+      }
+    }
+
+    // Só move a peça se o turno for o correto para a cor da peça
+    if ((this.cor != tabuleiro.corTurno())) { 
       System.out.println("Turno errado");
       return false;
     } 
 
-    //return (!destino.possuiPeca() || this.ehBranca() != destino.getPeca().ehBranca()) && this.ehPosicaoPermitida(destino, tabuleiro);
-    return !destino.possuiPeca() && (canMoveToCapture(destino, tabuleiro) || this.ehPosicaoPermitida(destino, tabuleiro));
+    ArrayList<Peca> pecasBrancasQPodemCapturar = tabuleiro.encontractPecasQuePodemCapturar(this.ehBranca());
+    System.out.println(pecasBrancasQPodemCapturar.toString());
+
+    boolean temPecasQPodeCapturar = pecasBrancasQPodemCapturar.size() > 0;
+    boolean ehUmaDasQPodemCapturar = pecasBrancasQPodemCapturar.contains(this);
+
+    if ((temPecasQPodeCapturar && !ehUmaDasQPodemCapturar) || ( ehUmaDasQPodemCapturar && Math.abs(deltaX) != 2)) {
+      return false;
+    }
+
+    //  Se a peça for se mover e capturar outra peça a flag de movimento e captura é setada True(para realizar outro movimento)
+    boolean capture = canMoveToCapture(destino, tabuleiro, false);
+    boolean move = !destino.possuiPeca() && (capture || this.ehPosicaoPermitida(destino, tabuleiro));   
+    if (move && capture) {
+      this.setMoveAndCapture(true);
+      return move;
+    } 
+
+    this.setMoveAndCapture(false);
+    return move;
   }
 
-  public boolean canMoveToCapture(Casa destino, Tabuleiro tabuleiro) {
+  /**
+   * Executa em 2 modos, pesquisa e não pesquisa 
+   * Em modo pesquisa apenas verifica se há alguma peça para capturar sem remove-la.
+   * Em modo não pesquisa além de verificar se há uma peça para capturar ainda remove essa peça
+   * 
+   * @param destino A casa para onde a peça vai depois que fazer a captura.
+   * @param tabuleiro Tabuleiro do jogo.
+   * @param search Quando true ativa o modo pesquisa.
+   * 
+   */
+  public boolean canMoveToCapture(Casa destino, Tabuleiro tabuleiro, boolean search) {
     int posicaoXOrigem = this.casa.getPosicaoX();
     int posicaoYOrigem = this.casa.getPosicaoY();
     int posicaoXDestino = destino.getPosicaoX();
@@ -133,8 +241,10 @@ public abstract class Peca {
       Peca pecaDeCaptura = casaDeCaptura.getPeca();
 
       if (casaDeCaptura.possuiPeca() && !this.ehMesmaCor(pecaDeCaptura)) {
-        // Captura e move
-        casaDeCaptura.removerPeca(tabuleiro);
+        // Captura e move, remove a peça capturada se a função não for executada no modo pesquisa
+        if(!search){
+          casaDeCaptura.removerPeca(tabuleiro);     
+        }
         return true;
       }      
     }
@@ -143,4 +253,48 @@ public abstract class Peca {
      return false;
       
   }
+
+  public boolean podeCapturar(Tabuleiro tabuleiro) {
+    ArrayList<Integer> posicoesProibidas = new ArrayList<Integer>();
+    posicoesProibidas.add(-1);
+    posicoesProibidas.add(8);
+
+    for (int i = -1; i <= 1; i += 2) {
+      for (int j = -1; j <= 1; j += 2) {
+        int x = this.casa.getPosicaoX() + i;
+        int y = this.casa.getPosicaoY() + j;
+
+        if (posicoesProibidas.contains(x) || posicoesProibidas.contains(y)) {
+          continue;
+        }
+
+        Casa casa = tabuleiro.getCasa(x, y);
+        Peca peca = casa.getPeca();
+        int xDeCaptura = x + i;
+        int yDeCaptura = y + j;
+
+        if (posicoesProibidas.contains(xDeCaptura) || posicoesProibidas.contains(yDeCaptura)) {
+          continue;
+        }
+
+        Casa casaDeCaptura = tabuleiro.getCasa(xDeCaptura, yDeCaptura);
+        boolean casaDeCapturaLivre = !casaDeCaptura.possuiPeca();
+        
+        if (casa.possuiPeca() && !this.ehMesmaCor(peca) && casaDeCapturaLivre) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public boolean isMoveAndCapture() {
+    return moveAndCapture;
+  }
+  
+  public void setMoveAndCapture(boolean moveAndCapture) {
+    this.moveAndCapture = moveAndCapture;
+  }
+
 }
