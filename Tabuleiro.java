@@ -13,6 +13,19 @@ public class Tabuleiro {
   private boolean turnoPreto;
   private int totalBrancas = 12;
   private int totalPretas = 12;  
+  private Peca pecaQCapturou;
+
+  public Peca getPecaQCapturou() {
+    return pecaQCapturou;
+  }
+
+  public void setPecaQCapturou(Peca pecaQCapturou) {
+    this.pecaQCapturou = pecaQCapturou;
+  }
+
+  public void removerPecaQCapturou() {
+    this.pecaQCapturou = null;
+  }
 
   public Tabuleiro() {
     casas = new Casa[8][8];
@@ -41,7 +54,7 @@ public class Tabuleiro {
   }
 
   public void setTurnoPreto(boolean turnoPreto) {
-      turnoPreto = turnoPreto;
+      this.turnoPreto = turnoPreto;
   }
 
   public void inverteTurno() {
@@ -62,7 +75,7 @@ public class Tabuleiro {
       for(int j = 0; j < 8; j++) {
         Casa casa = casas[i][j];
         Peca peca = casa.getPeca();
-        if(casa.possuiPeca() && peca.ehBranca() && peca.podeCapturar(this)) {
+        if(casa.possuiPeca() && peca.ehBranca() && peca.estaEmPosicaoDeCapturar(this)) {
           pecasQPodemCapturar.add(peca);
         }
       }
@@ -78,7 +91,7 @@ public class Tabuleiro {
       for(int j = 0; j < 8; j++) {
         Casa casa = casas[i][j];
         Peca peca = casa.getPeca();
-        if(casa.possuiPeca() && !peca.ehBranca() && peca.podeCapturar(this)) {
+        if(casa.possuiPeca() && !peca.ehBranca() && peca.estaEmPosicaoDeCapturar(this)) {
           System.out.println("É dama? vv");
           System.out.println(peca instanceof Dama);
           pecasQPodemCapturar.add(peca);

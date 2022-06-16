@@ -43,7 +43,7 @@ public class Dama extends Peca {
   void promover() {}
 
   @Override
-  public boolean capturar(Casa destino, Tabuleiro tabuleiro) {
+  public boolean podeCapturar(Casa destino, Tabuleiro tabuleiro) {
     int posicaoXOrigem = this.casa.getPosicaoX();
     int posicaoYOrigem = this.casa.getPosicaoY();
     int posicaoXDestino = destino.getPosicaoX();
@@ -75,7 +75,7 @@ public class Dama extends Peca {
     }
 
     if (quantidadeDePecas == 1 && !this.ehMesmaCor(ultimaPeca)) {
-        casaDaUltimaPeca.removerPeca(tabuleiro);
+      this.casaDeCaptura = casaDaUltimaPeca;   
       return true;
     }
 
@@ -83,8 +83,7 @@ public class Dama extends Peca {
   }
 
   @Override
-  public boolean podeCapturar(Tabuleiro tabuleiro) {
-
+  public boolean estaEmPosicaoDeCapturar(Tabuleiro tabuleiro) {
     for (int i = -1; i <= 1; i += 2) {
       for (int j = -1; j <= 1; j += 2) {
         for (int k = 1; k < 8; k++) {
@@ -168,38 +167,20 @@ public class Dama extends Peca {
     int deltaX = posicaoXDestino - posicaoXOrigem;
     int deltaY = posicaoYDestino - posicaoYOrigem;
 
+    boolean moveAndCapture = tabuleiro.getPecaQCapturou() == this;
+
     if (Math.abs(deltaX) != Math.abs(deltaY)) return false;
     // Verificando se outra peça fez um movimento de captura e tem que se mover de novo
-    for (int i = 0; i <= 7; i++) {
-      for (int j = 0; j <= 7; j++) {
-        Casa casa = tabuleiro.getCasa(i, j);
-        if(casa.possuiPeca()) {
-          Peca peca = casa.getPeca();
-          //System.out.println(casa != this.casa);
-          if(peca.moveAndCapture && casa != this.casa) {
-            if (pecaIsBlack && tabuleiro.isTurnoPreto()) {
-              System.out.println("Apenas a peça vermelha que fez a captura pode se mover");
-            } else if (!pecaIsBlack && !tabuleiro.isTurnoPreto()){
-              System.out.println("Apenas a peça branca que fez a captura pode se mover");
-            }
-         
-            return false;
-          }
-        }
+    if (!moveAndCapture) {
+      if (pecaIsBlack && tabuleiro.isTurnoPreto()) {
+        System.out.println("Apenas a peça vermelha que fez a captura pode se mover");
+      } else if (!pecaIsBlack && !tabuleiro.isTurnoPreto()){
+        System.out.println("Apenas a peça branca que fez a captura pode se mover");
       }
     }
 
-    if (this.moveAndCapture) {
-      ArrayList<int[]> deltas = this.encontrarCasasParaCapturar(tabuleiro);
-      boolean vaiCapturar = false;
-      for (int[] delta : deltas) {
-        boolean deltaXvalido = Math.abs(deltaX) >= Math.abs(delta[0]) && mesmaDirecao(deltaX, delta[0]);
-        boolean deltaYvalido = Math.abs(deltaY) >= Math.abs(delta[1]) && mesmaDirecao(deltaY, delta[1]);
-        if (deltaXvalido && deltaYvalido) {
-          vaiCapturar = true;
-        }
-      }
-      if (!vaiCapturar) return false;
+    if (moveAndCapture && !this.vaiCapturar(tabuleiro, deltaX, deltaY)) {
+      return false; 
     }
 
     // Só move a peça se o turno for o correto para a cor da peça
@@ -217,30 +198,28 @@ public class Dama extends Peca {
 
     if (temPecasQPodeCapturar && !ehUmaDasQPodemCapturar) {
       return false;
-    } else if (ehUmaDasQPodemCapturar) {
-      ArrayList<int[]> deltas = this.encontrarCasasParaCapturar(tabuleiro);
-      boolean vaiCapturar = false;
-      for (int[] delta : deltas) {
-        boolean deltaXvalido = Math.abs(deltaX) >= Math.abs(delta[0]) && mesmaDirecao(deltaX, delta[0]);
-        boolean deltaYvalido = Math.abs(deltaY) >= Math.abs(delta[1]) && mesmaDirecao(deltaY, delta[1]);
-        if (deltaXvalido && deltaYvalido) {
-          vaiCapturar = true;
-        }
-      }
-      if (!vaiCapturar) return false;
+    } else if (ehUmaDasQPodemCapturar && !this.vaiCapturar(tabuleiro, deltaX, deltaY)) {
+      return false;
     }
 
-
-
     //  Se a peça for se mover e capturar outra peça a flag de movimento e captura é setada True(para realizar outro movimento)
-    boolean capture = capturar(destino, tabuleiro);
+    boolean capture = podeCapturar(destino, tabuleiro);
     boolean move = !destino.possuiPeca() && (capture || this.ehPosicaoPermitida(destino, tabuleiro));   
-    if (move && capture) {
-      this.setMoveAndCapture(true);
-      return move;
-    } 
-
-    this.setMoveAndCapture(false);
+    
     return move;
+  }
+
+  public boolean vaiCapturar(Tabuleiro tabuleiro, int deltaX, int deltaY) {
+    ArrayList<int[]> deltas = this.encontrarCasasParaCapturar(tabuleiro);
+    boolean vaiCapturar = false;
+    for (int[] delta : deltas) {
+      boolean deltaXvalido = Math.abs(deltaX) >= Math.abs(delta[0]) && this.mesmaDirecao(deltaX, delta[0]);
+      boolean deltaYvalido = Math.abs(deltaY) >= Math.abs(delta[1]) && this.mesmaDirecao(deltaY, delta[1]);
+      if (deltaXvalido && deltaYvalido) {
+        vaiCapturar = true;
+      }
+    }
+
+    return vaiCapturar;
   }
 }

@@ -33,17 +33,17 @@ public class Jogo {
         Casa casa = tabuleiro.getCasa(j, i);
         new Pedra(casa, Cor.PRETA);
       }
-      }
+    }
   }
   
   public void criarPecasBrancas() {    
     for(int i = 0; i < 3; i++) { // cria as 12 peças brancas
       for(int j = 0; j < 8; j += 2) {
-      if (i % 2 == 1 && j == 0) {
-        j++;
-      }
-      Casa casa = tabuleiro.getCasa(j, i);
-      new Pedra(casa, Cor.BRANCA);
+        if (i % 2 == 1 && j == 0) {
+          j++;
+        }
+        Casa casa = tabuleiro.getCasa(j, i);
+        new Pedra(casa, Cor.BRANCA);
       }
     }
   }
